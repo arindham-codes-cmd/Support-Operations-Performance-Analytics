@@ -64,11 +64,12 @@ We reviewed column types manually and ensured they aligned with expected formats
 - Null Analysis Using Dynamic SQL
  You wrote a dynamic SQL script that looped through all columns to count nulls and calculate null percentages. This gave a clear snapshot of data quality across the board.
 Example: SELECT COUNT(*) - COUNT(column_name) AS null_count FROM raw_support_tickets
-(insert image)
+
+<img src="05.visuals/01.Null Values.png" alt="Null Values" width="400"/>
 
 - Distinct Counts
  You ran SELECT COUNT(DISTINCT column) across key fields like channel_name, category, product_category, agent_name, and customer_city to understand cardinality and segmentation potential.
-(insert image)
+<img src="05.visuals/02.Distinct Count.png" alt="Distinct Values" width="400"/>
 
 - Timestamp Range Checks
  Using MIN() and MAX() on order_date_time, issue_reported_date_time, issue_responded_date_time, and survey_response_date, you validated the temporal scope and confirmed a short date range.
@@ -107,11 +108,13 @@ from support_ticket_data
  Since remarks are free-text and optional, We preserved them as-is for potential Gen AI use later (e.g., summarization or sentiment analysis).
 
 ## 1.3 Timestamp Logic & Sequence Checks
-- Issue Reported Before Order Date
+- Issue Reported Before Order Date:
  We checked for cases where issue_reported_date_time < order_date_time, which could indicate data entry errors or post-order issues.
-- Responded vs Reported
+<img src="05.visuals/03.Timestamp Logic.png" alt="Timestamp Logic" width="800"/>
+
+- Responded vs Reported:
  We ensured that issue_responded_date_time always came after issue_reported_date_time , a key check for calculating resolution time.
-- Time Sequence Validation
+- Time Sequence Validation:
  These checks confirmed that the ticket lifecycle followed a logical order, and helped us avoid negative durations or misleading SLA flags.
 
 ## 1.4 Creating the Staging Table (stg_support_tickets)
@@ -161,6 +164,7 @@ With the staging table (stg_support_tickets) in place, Phase 2 focused on extrac
  Inbound tickets dominated volume (~79%), but Outcall consistently showed faster resolution times and higher CSAT scores. Email lagged behind on both fronts, highlighting a need for channel-specific process improvements.
 - Category & Sub-Category Trends
  Top categories and sub-categories were ranked per channel and product, helping identify which issue types drive the most volume and where resolution delays are concentrated.
+<img src="05.visuals/04.Top 5 categories.png" alt="Top 5 Categories" width="800"/>
 - SLA Compliance
  Tickets resolved within 48 hours were flagged as SLA_MET, while others were marked SLA_BREACHED. This binary flag enabled quick filtering and performance tracking across teams, shifts, and product lines.
 - Price Band vs Resolution & CSAT
@@ -223,6 +227,7 @@ Line chart showing weekly ticket volume (~86K total), helping track operational 
 Trend line showing resolution time fluctuations, it is useful for spotting any seasonal delays or any process caused delays.
 - SLA % and CSAT Score by Week
 KPI cards and line charts showing SLA compliance (~98.88%) and CSAT trends (~4.24 average), helping monitor service quality over time.
+<img src="05.visuals/05.Ticket Vol-Resolution.png" alt="Ticket Volumn" width="800"/>
 
 ### 2. Category Level Insights
 - Ticket Volume by Category
@@ -231,6 +236,7 @@ Bar chart showing top categories like Returns, Order Related, Refunds, etc.
 Table comparing resolution hours and CSAT across categories , e.g., App/ Websites, Payments and Returns had high CSAT, while “Others” had low csat scores and long resolution times.
 - SLA Breach % by Category
 Visual flagging categories with higher breach rates, it useful for prioritizing process fixes.
+<img src="05.visuals/06.Category Insights.png" alt="Category Insights" width="800"/>
 
 ### 3. Channel Performance
 - Ticket Volume by Channel
@@ -239,7 +245,7 @@ Inbound dominated (~60K+), followed by Outcall and Email.
 Outcall had the fastest resolution; Email was slowest. CSAT scores varied slightly across channels.
 - SLA Breach % by Channel
 Email showed the highest breach rate, reinforcing the need for channel specific SLA monitoring.
-
+<img src="05.visuals/07.channel performance.png" alt="chanel performance" width="800"/>
 
 ### 4. Agent & Manager Performance
 - Agent-Level Table
@@ -248,6 +254,7 @@ KPIs for each agent: ticket count, resolution time, CSAT, SLA %. Helps identify 
 Aggregated metrics by manager for e.g., William Kim’s team had the fastest resolution and highest SLA compliance.
 - Shift vs Performance
 Bar chart showing resolution time by shift (Morning, Evening, Night, etc.). Useful for staffing decisions.
+<img src="05.visuals/08. Agent Performance.png" alt="Agent performance" width="800"/>
 
 ### 5. Customer & Price Insights
 - Top Cities by Purchase Value
@@ -256,6 +263,8 @@ Cities like Hyderabad, Mumbai, Bangalore led both metrics. It is useful for regi
 Higher-priced items showed better CSAT, validating the price band logic.
 - Price Band vs Resolution Time
 Tickets were segmented into Low, Medium, High using percentile logic, helping analyze service prioritization.
+<img src="05.visuals/09.cust and price insight.png" alt="cust and price insight" width="800"/>
+
 
 # Key Insights & Business Outcomes
 
