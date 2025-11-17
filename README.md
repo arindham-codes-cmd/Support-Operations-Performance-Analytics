@@ -153,7 +153,65 @@ from
 support_ticket_data
 ```
 
+# Phase 2 — KPI Views & Analysis (SQL)
+With the staging table (stg_support_tickets) in place, Phase 2 focused on extracting operational KPIs and identifying patterns that directly impact resolution time and customer satisfaction. Rather than explaining every query, we focused on high-impact metrics that support the core business problem.
 
+## Key Insights
+- Channel Performance
+ Inbound tickets dominated volume (~79%), but Outcall consistently showed faster resolution times and higher CSAT scores. Email lagged behind on both fronts, highlighting a need for channel-specific process improvements.
+- Category & Sub-Category Trends
+ Top categories and sub-categories were ranked per channel and product, helping identify which issue types drive the most volume and where resolution delays are concentrated.
+- SLA Compliance
+ Tickets resolved within 48 hours were flagged as SLA_MET, while others were marked SLA_BREACHED. This binary flag enabled quick filtering and performance tracking across teams, shifts, and product lines.
+- Price Band vs Resolution & CSAT
+ Higher-priced items tended to receive faster resolution and better CSAT, suggesting prioritization logic or customer expectation
+
+**How we decided the price band logic:**
+To segment tickets by item value, we created three price bands: Low, Medium, and High. Instead of choosing arbitrary thresholds, we used a percentile-based approach
+
+- We sorted all 85,000 tickets by item_price.
+- The bottom 33% (first ~28,000 rows) were labeled Low.
+- The middle 33% (rows ~28,001 to ~56,000) were labeled Medium.
+- The top 33% (remaining ~28,000 rows) were labeled High.
+
+This method ensures that each bucket has a roughly equal number of tickets, making comparisons fair and statistically balanced. It also adapts to the actual price distribution in the dataset, rather than relying on fixed thresholds
+```
+-- Check if when item price is high then resolution time taken is low ? 
+select 
+	case
+		when item_price >= 25000 then 'High Price'
+		when item_price between	5000 and 24999 then 'Medium Price'
+		else 'Low Price'
+	end as price_band,
+	count(*) as total_tickets,
+	cast(avg(DATEDIFF(minute, issue_reported_date_time, issue_responded_date_time)/60)as decimal(5,2)) as avg_resolution_hours,
+	avg(csat_score) as csat_score
+from stg_support_tickets
+where item_price is not null
+group by
+	case
+		when item_price >= 25000 then 'High Price'
+		when item_price between	5000 and 24999 then 'Medium Price'
+		else 'Low Price'
+	end
+order by avg_resolution_hours
+```
+
+- Agent Hierarchy & Tenure
+ Resolution time and CSAT were analyzed across managers, supervisors, and agent shifts. More tenured agents showed slightly better performance, and certain shifts consistently outperformed others.
+- City-Level Impact
+ We identified top cities by ticket volume and purchase value, helping localize support strategies and understand regional demand.
+
+## Enriched table 	
+To streamline dashboarding and avoid repetitive logic, we created an enriched table using CTAS:
+- enriched_support_data includes derived fields like:
+ - resolution_hours, sla_flag, item_price_segment
+ - Time breakdowns (week, month, year)
+ - Flags for missing remarks and filled handling time
+   
+This table acts as a clean, business-ready layer for Power BI, reducing load time, simplifying DAX, and making the model easier to maintain.
+
+We also created SQL view to pre-aggregate KPIs like SLA compliance, CSAT trends, and resolution summaries. This enriched view will be loaded in the Power BI for further use in reporting and dashboard. 
 
 
 
