@@ -213,6 +213,99 @@ This table acts as a clean, business-ready layer for Power BI, reducing load tim
 
 We also created SQL view to pre-aggregate KPIs like SLA compliance, CSAT trends, and resolution summaries. This enriched view will be loaded in the Power BI for further use in reporting and dashboard. 
 
+# Phase 3 — Interactive Dashboard Development (Power BI)
+
+## Dashboard Pages Overview
+### 1. Ticket Volume & Resolution Trends
+- Total Tickets by Week
+Line chart showing weekly ticket volume (~86K total), helping track operational load.
+- Avg Resolution Hours by Week
+Trend line showing resolution time fluctuations, it is useful for spotting any seasonal delays or any process caused delays.
+- SLA % and CSAT Score by Week
+KPI cards and line charts showing SLA compliance (~98.88%) and CSAT trends (~4.24 average), helping monitor service quality over time.
+
+### 2. Category Level Insights
+- Ticket Volume by Category
+Bar chart showing top categories like Returns, Order Related, Refunds, etc.
+- Avg Resolution & CSAT by Category
+Table comparing resolution hours and CSAT across categories , e.g., App/ Websites, Payments and Returns had high CSAT, while “Others” had low csat scores and long resolution times.
+- SLA Breach % by Category
+Visual flagging categories with higher breach rates, it useful for prioritizing process fixes.
+
+### 3. Channel Performance
+- Ticket Volume by Channel
+Inbound dominated (~60K+), followed by Outcall and Email.
+- Avg Resolution & CSAT by Channel
+Outcall had the fastest resolution; Email was slowest. CSAT scores varied slightly across channels.
+- SLA Breach % by Channel
+Email showed the highest breach rate, reinforcing the need for channel specific SLA monitoring.
+
+
+### 4. Agent & Manager Performance
+- Agent-Level Table
+KPIs for each agent: ticket count, resolution time, CSAT, SLA %. Helps identify top and bottom performers.
+- Manager-Level Summary
+Aggregated metrics by manager for e.g., William Kim’s team had the fastest resolution and highest SLA compliance.
+- Shift vs Performance
+Bar chart showing resolution time by shift (Morning, Evening, Night, etc.). Useful for staffing decisions.
+
+### 5. Customer & Price Insights
+- Top Cities by Purchase Value
+Cities like Hyderabad, Mumbai, Bangalore led both metrics. It is useful for regional strategy.
+- CSAT vs Item Price Segment
+Higher-priced items showed better CSAT, validating the price band logic.
+- Price Band vs Resolution Time
+Tickets were segmented into Low, Medium, High using percentile logic, helping analyze service prioritization.
+
+# Key Insights & Business Outcomes
+
+**1. Inbound Dominates Volume but Not Efficiency**
+- Inbound tickets made up ~79% of total volume, but had longer resolution times compared to Outcall.
+- Email, while low in volume, had the highest SLA breach rate and slowest response. This indicates a need for process optimization or automation.
+
+**2. Certain Categories Drive Delays & Low CSAT**
+- Categories like “Others” and “App/Website” had longer resolution times and lower CSAT scores.
+- In contrast, Payments and Returns were resolved faster and had higher satisfaction, suggesting clearer SOPs or better trained agents in those areas.
+
+**3. SLA Compliance Is High but Breaches Are Concentrated**
+- Overall SLA compliance was 98.88%, but 964 tickets breached the 48-hour threshold.
+- These breaches were not random, they clustered around specific channels (Email) and categories (Others, App/Website), making them fixable through targeted interventions.
+
+**4. Agent & Shift-Level Performance Gaps Exist**
+- Agent performance varied widely. Some agents had resolution times >8 hours with CSAT <3.5.
+- Shift analysis showed that Morning and Evening shifts performed better than Night or Split shifts, suggesting potential staffing or training gaps
+
+**5. Price Band Influences Resolution & Satisfaction**
+- Tickets were bucketed into Low, Medium, and High price bands using a percentile-based approach.
+- Higher-priced items were resolved faster and received better CSAT scores, indicating either prioritization or higher customer expectations.
+
+**6. City Level Trends Inform Regional Strategy**
+- Cities like Hyderabad, Mumbai, and Bangalore led in both ticket volume and total purchase value.
+- This insight can guide resource allocation, regional training, or localized support strategies.
+
+# Conclusion & Roadmap
+
+This project successfully identified key operational inefficiencies, agent performance gaps, and SLA risks across 85K+ support tickets. The enriched SQL pipeline and Power BI dashboard now serve as a decision-ready tool for support leaders, enabling faster diagnosis, smarter routing, and targeted performance management.
+
+The dashboard provides:
+- A clear view of ticket volume, resolution time, and CSAT trends across channels, categories, and shifts
+- SLA breach tracking with drilldowns by agent, manager, and product
+- Price-band and city-level segmentation for prioritizing high-value customers
+- A scalable framework for future automation and predictive analytics
+
+### Future Enhancements
+To extend the impact and make the dashboard smarter, the following enhancements can be planned:
+
+- NLP for Remarks → Sentiment analysis and auto-tagging of customer feedback
+- AI-Based Category Prediction → Suggest likely issue types based on ticket text
+- Automated SLA Breach Alerts → Real-time notifications for at-risk tickets
+- Power BI Service Integration → Scheduled refresh, role-based access, and cloud sharing
+- Incremental Refresh Logic → Efficient data updates without full reloads
+- Drillthrough Agent Pages → Personalized dashboards for agent-level coaching and review
+
+
+
+
 
 
 
