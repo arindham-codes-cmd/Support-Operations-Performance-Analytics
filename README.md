@@ -84,7 +84,7 @@ select
 		when Customer_City is null then 'Unknown'
 		else Customer_City
 	end as customer_city_filled
-from support_ticket_data
+from support_ticket_data ```
 
 - product_category → 'Product Unknown'
  Similar logic — missing product types were labeled explicitly so they could be tracked separately in dashboards.
@@ -96,7 +96,7 @@ select
 		else Product_category
 	end as product_category_filled
 from support_ticket_data
-
+```
 - order_date_time left as NULL
  We chose not to impute this field since it wasn’t critical for SLA or CSAT analysis, and many tickets didn’t involve an order.
 - connected_handling_duration_time not blindly filled
@@ -149,8 +149,7 @@ into
 stg_support_tickets
 from 
 support_ticket_data
-
-
+```
 
 
 
