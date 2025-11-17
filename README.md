@@ -84,10 +84,12 @@ select
 		when Customer_City is null then 'Unknown'
 		else Customer_City
 	end as customer_city_filled
-from support_ticket_data ```
+from support_ticket_data
+```
 
 - product_category → 'Product Unknown'
  Similar logic — missing product types were labeled explicitly so they could be tracked separately in dashboards.
+
 ```SQL
 select 
 	Product_category,
