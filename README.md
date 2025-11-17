@@ -48,6 +48,110 @@ We track order_date_time, issue_reported_date_time, issue_responded_date_time, a
 
 The dataset spans a short date range, which is important to keep in mind when interpreting trends. Despite some missing values, the data is well suited for operational analysis especially once cleaned and enriched through SQL.
 
+# Phase 1 — Data Exploration & Cleaning (SQL)
+
+This phase was all about understanding the raw dataset and preparing a clean, analysis ready staging table. The SQL script was structured to explore data quality, validate timestamps, and make thoughtful decisions about missing values and not just fill them blindly.
+
+## 1.1 Profiling the Raw Data
+We began by inspecting the raw structure and profiling each column
+
+- Row Count
+  A simple SELECT COUNT(*) confirmed the volume which is over 85,000 rows.
+ 
+- Data Types & Structure
+We reviewed column types manually and ensured they aligned with expected formats (e.g., datetime fields, numeric price, text remarks).
+
+- Null Analysis Using Dynamic SQL
+ You wrote a dynamic SQL script that looped through all columns to count nulls and calculate null percentages. This gave a clear snapshot of data quality across the board.
+Example: SELECT COUNT(*) - COUNT(column_name) AS null_count FROM raw_support_tickets
+(insert image)
+
+- Distinct Counts
+ You ran SELECT COUNT(DISTINCT column) across key fields like channel_name, category, product_category, agent_name, and customer_city to understand cardinality and segmentation potential.
+(insert image)
+
+- Timestamp Range Checks
+ Using MIN() and MAX() on order_date_time, issue_reported_date_time, issue_responded_date_time, and survey_response_date, you validated the temporal scope and confirmed a short date range.
+
+## 1.2 Handling Missing Values 
+
+- customer_city → 'Unknown'
+ Instead of dropping rows, you replaced missing cities with 'Location Unknown' to preserve volume and allow location based analysis.
+```SQL
+select 
+	*,
+	case 
+		when Customer_City is null then 'Unknown'
+		else Customer_City
+	end as customer_city_filled
+from support_ticket_data
+
+- product_category → 'Product Unknown'
+ Similar logic — missing product types were labeled explicitly so they could be tracked separately in dashboards.
+```SQL
+select 
+	Product_category,
+	case 
+		when Product_category is null then 'Unknown'
+		else Product_category
+	end as product_category_filled
+from support_ticket_data
+
+- order_date_time left as NULL
+ We chose not to impute this field since it wasn’t critical for SLA or CSAT analysis, and many tickets didn’t involve an order.
+- connected_handling_duration_time not blindly filled
+  We added logic to fill missing handling time only for non-call channels (e.g., email), where handling time isn’t tracked. This avoided skewing resolution metrics.
+-  customer_remarks left untouched
+ Since remarks are free-text and optional, We preserved them as-is for potential Gen AI use later (e.g., summarization or sentiment analysis).
+
+## 1.3 Timestamp Logic & Sequence Checks
+- Issue Reported Before Order Date
+ We checked for cases where issue_reported_date_time < order_date_time, which could indicate data entry errors or post-order issues.
+- Responded vs Reported
+ We ensured that issue_responded_date_time always came after issue_reported_date_time , a key check for calculating resolution time.
+- Time Sequence Validation
+ These checks confirmed that the ticket lifecycle followed a logical order, and helped us avoid negative durations or misleading SLA flags.
+
+## 1.4 Creating the Staging Table (stg_support_tickets)
+Once the data was profiled and cleaned, we used a CTAS (Create Table As Select) approach to build the staging table
+
+- We standardized column names for consistency.
+- Applied transformations like:
+  - COALESCE(item_price, 0) → to fill missing prices
+  -  CASE logic for price segmentation (High, Medium, Low)
+  -    Derived resolution_hours using DATEDIFF between reported and responded timestamps
+  - Flagged SLA breaches (resolution_hours > 48 → 'SLA_BREACHED')
+
+```SQL
+-- creating CTAS with name stg_support_tickets
+select
+	Unique_id as ticket_id,
+	channel_name, 
+	category,
+	Sub_category as sub_category, 
+	Customer_Remarks as customer_remarks, 
+	Order_id as order_id,
+	order_date_time as ordered_date_time,
+	Issue_reported_at as issue_reported_date_time,
+	issue_responded as issue_responded_date_time,
+	Survey_response_Date as survey_response_date_time,
+	coalesce(Customer_City, 'Location Unknown') as customer_city, 
+	coalesce(Product_category, 'Product Unknown') as product_category, 
+	Item_price as item_price,
+	connected_handling_time as connected_handling_duration_time,
+	Agent_name as agent_name,
+	Supervisor as supervisor,
+	Manager as manager, 
+	Tenure_Bucket as tenure,
+	Agent_Shift as agent_shift,
+	CSAT_Score as csat_score
+into
+stg_support_tickets
+from 
+support_ticket_data
+
+
+
 
 
 
