@@ -1,3 +1,5 @@
+**Originally developed by Arindham Krishna**  
+GitHub: [arindham-codes-cmd](https://github.com/arindham-codes-cmd)
 # Support-Operations-Performance-Analytics
 We will be doing a performance analytics using SQL and Power BI for more than 85,000 customer support tickets, analytics will help us improve optimize resolution time, improve SLA performance and identify any level inefficiencies.
 
@@ -312,7 +314,15 @@ To extend the impact and make the dashboard smarter, the following enhancements 
 - Incremental Refresh Logic → Efficient data updates without full reloads
 - Drillthrough Agent Pages → Personalized dashboards for agent-level coaching and review
 
+## Credits
 
+This project was originally created and maintained by **Arindham Krishna**.  
+All logic, analysis, data handling scripts and DAX formulas were authored by [arindham-codes-cmd](https://github.com/arindham-codes-cmd).
+
+## Fork Notice
+
+If you’re viewing this project from a forked repository, please note that the original version was developed by **Arindham Krishna**.  
+Visit the source repo here: [Support-Operations-Performance-Analytics](https://github.com/arindham-codes-cmd/Support-Operations-Performance-Analytics)
 
 
 
